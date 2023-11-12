@@ -5,7 +5,7 @@ function initial() {
 }
 
 mongoose
-  .connect("mongodb://127.0.0.1:27017/eatout2", {
+  .connect("mongodb+srv://bett:19990303je@cluster0.okpp7ux.mongodb.net/karaba?retryWrites=true&w=majority", {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })

@@ -207,18 +207,29 @@ app.post('/subscribe', async (req, res) => {
     console.log(subscriber);
 });
 app.post('/registerrestaurant', async (req, res) => {
-    const restaurants = {
-        managersname:req.body.managersname,
-        restaurantname:req.body.restaurantname,
-        email: req.body.email,
-        managersphone:req.body.managersphone,
-        location:req.body.location,
-        cuisines:req.body.cuisines,
-        username:req.body.username
-    };
+    try {
+        const restaurants = {
+            managersname: req.body.managersname,
+            restaurantname: req.body.restaurantname,
+            email: req.body.email,
+            managersphone: req.body.managersphone,
+            location: req.body.location,
+            cuisines: req.body.cuisines,
+            restaurantphone: req.body.restaurantphone,
+            username: req.body.username
+        };
 
-    const register = await Register.create(restaurants);
-    console.log(register);
+        const register = await Register.create(restaurants);
+        console.log(register);
+
+        // Respond with a JSON object indicating success
+        res.json({ success: true, message: 'Restaurant registered successfully', data: register });
+    } catch (error) {
+        console.error(error);
+
+        // Respond with a JSON object indicating failure
+        res.status(500).json({ success: false, message: 'Error registering restaurant' });
+    }
 });
 
 // Add more route handlers here...

@@ -19,16 +19,16 @@ const RegistrationSchema = new Schema({
         type: String,
         required: true
     },
-    mangersphone: {
+    managersphone: {
         type: String,
         required: true
     },
     location: {
-        type: Date,
+        type: String,
         required:true
     },
     cuisines: {
-        type: Date,
+        type: String,
        required:true
     },
     username:{
