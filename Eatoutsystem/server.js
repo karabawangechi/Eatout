@@ -171,29 +171,36 @@ app.post('/login',async(req,res)=>{
    
 }); 
 app.post('/reserve', async (req, res) => {
-    const table = {
-        name: req.body.name,
-        capacity: req.body.capacity,
-        email: req.body.email,
-        phone: req.body.phone,
-        date:req.body.date
+    const { name, capacity, email, phone, date,time } = req.body; // Destructure req.body for cleaner code
+
+    const reservationData = {
+        name,
+        capacity,
+        email,
+        phone,
+        date,
+        time
     };
 
     try {
-        const existingReservation = await Table.findOne({ name: table.name });
+        // Create a new reservation without checking for existing reservations
+        const newReservation = await Table.create(reservationData);
 
-        if (existingReservation) {
-            res.render('403.ejs'); // Reservation with the same name exists
-        } else {
-            const Reservation = await Table.create(table);
-            console.log(Reservation);
-            res.render('reservation.ejs'); // Successfully created the reservation
-        }
+        // Log the created reservation for debugging purposes
+        console.log('New Reservation:', newReservation);
+
+        // Successfully created the reservation
+        // Render the reservation.ejs file
+        return res.render('reservation.ejs', { 
+            message: 'Reservation successfully created',
+            reservation: newReservation 
+        });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'An error occurred' });
+        console.error('Error creating reservation:', error);
+        return res.status(500).json({ error: 'An error occurred' });
     }
 });
+
 
 
 app.post('/subscribe', async (req, res) => {
@@ -231,6 +238,51 @@ app.post('/registerrestaurant', async (req, res) => {
         res.status(500).json({ success: false, message: 'Error registering restaurant' });
     }
 });
+
+app.post('/reservationoverview', async (req, res) => {
+    try {
+        const { startDate, endDate } = req.body;
+
+        // Validate the date range
+        if (!startDate || !endDate) {
+            return res.status(400).json({ success: false, message: 'Start date and end date are required' });
+        }
+
+        // Convert date strings to Date objects
+        const startDateTime = new Date(`${startDate}T00:00:00.000Z`);
+        const endDateTime = new Date(`${endDate}T23:59:59.999Z`);
+
+        console.log('Start Date:', startDateTime);
+        console.log('End Date:', endDateTime);
+
+        // Query reservations within the specified date range for both date and createdAt
+        const reservations = await Table.find({
+            $or: [
+                {
+                    date: {
+                        $gte: startDateTime,
+                        $lte: endDateTime
+                    }
+                },
+                {
+                    createdAt: {
+                        $gte: startDateTime,
+                        $lte: endDateTime
+                    }
+                }
+            ]
+        });
+
+        console.log('Retrieved Reservations:', reservations);
+
+        // Respond with a JSON object containing the reservations
+        res.json({ success: true, message: 'Reservation overview retrieved successfully', data: reservations });
+    } catch (error) {
+        console.error('Error retrieving reservation overview:', error);
+        res.status(500).json({ success: false, message: 'An error occurred while retrieving reservation overview' });
+    }
+});
+
 
 // Add more route handlers here...
 app.use('/', router);

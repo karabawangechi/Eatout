@@ -24,6 +24,14 @@ const TableSchema = new Schema({
         type: Date,
         required: true,
     },
+    date: {
+        type: String,
+        required: true,
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+    },
     isAvailable: {
         type: Boolean,
         default: true,
